@@ -4166,6 +4166,7 @@ pub fn create_font_recource_id(doc: &mut Document) -> (u32, u16) {
 
     let mut font_id_list: Dictionary = Dictionary::new();
     for i in CROSS_PDF_NAME_FONT_TO_STRING_NAME.iter() {
+        let obj:String = i.1.into();
         let font_id = doc.add_object(dictionary! {
             "Type" => "Font",
             "Subtype" => "Type1",

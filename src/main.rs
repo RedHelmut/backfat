@@ -164,10 +164,30 @@ fn mimic_report() {
     //finish pdf
     let mut doc = lopdf::Document::with_version("1.5");
     let pages_id = doc.new_object_id();
-
+    let font_id = doc.add_object(dictionary! {
+		"Type" => "Font",
+		"Subtype" => "Type1",
+		"BaseFont" => "Courier",
+	});
+    let font_id_bold = doc.add_object(dictionary! {
+		"Type" => "Font",
+		"Subtype" => "Type1",
+		"BaseFont" => "Courier-Bold",
+	});
+    let resources_id = doc.add_object(dictionary! {
+		"Font" => dictionary! {
+			"F1" => font_id,
+			"F2" => font_id_bold,
+		},
+	});
     let mut v:Vec<lopdf::Object> = Vec::new();
 
-    for _ in 0..dox.manager.get_page_cnt() + 1 {
+    for page in 0..dox.manager.get_page_cnt() + 1 {
+        let content = Content {
+            operations: pdf_draw.pdf[page].clone()//draw_data_pdf(0.2, 1.0, &mut columns)
+        };
+        let content_id = doc.add_object(Stream::new(dictionary! {}, content.encode().unwrap()));
+
         let page_id = doc.add_object(dictionary! {
             "Type" => "Page",
             "Parent" => pages_id,
@@ -175,6 +195,7 @@ fn mimic_report() {
             });
         v.push( page_id.into() )
     };
+    let page_count = v.len() as i32;
     let pages = dictionary! {
 		"Type" => "Pages",
 		"Kids" => v,
