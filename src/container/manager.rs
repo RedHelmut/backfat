@@ -74,6 +74,24 @@ impl Manager {
     pub fn get_page_cnt(&self) -> usize {
         self.page_master.lock().unwrap().get_page_cnt()
     }
+    pub fn place_now<T: DrawInfoReq, F: ContainerTrait>(&mut self, height_pixels: f64, range: Range<usize>, draw_info: &mut T, f: &mut F, border: &Option<RefCell<Vec<Border>>>) {
+        let mut placement_handle = self.get_placement_handle( range, false );
+        placement_handle.set_pixel_height(height_pixels);
+        let draw_rec = placement_handle.placement_info.clone();
+        if draw_rec.page_number >= draw_info.page_array_size() {
+            draw_info.increment_page_buffer(draw_rec.page_number);
+        }
+        if let Some(last_placement) = f.on_draw(draw_rec, draw_info, border) {
+            placement_handle.placement_info = last_placement;
+        }
+
+        self.page_master.lock().unwrap().set_group(f.get_group(), &placement_handle.placement_info);
+
+        self.page_master
+            .lock()
+            .unwrap()
+            .update_placement(&placement_handle.placement_info);
+    }
 }
 
 //#[derive(Clone)]
@@ -175,7 +193,7 @@ impl CurrentPlacement {
         border: &Option<RefCell<Vec<Border>>>,
     ) -> ()
     where
-        F: ContainerTrait<T>,
+        F: ContainerTrait,
         T: DrawInfoReq,
     {
         let draw_rec = if let Some(place) = self.placement_info_to_pass_for_draw.clone() {

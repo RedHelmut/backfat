@@ -1,11 +1,10 @@
-use crate::container::container_trait::ContainerTrait;
+use crate::container::container_trait::{ContainerTrait, DrawInfoReq};
 use crate::container::manager::{CurrentPlacement, Manager};
 use crate::container::page_size_info::PageSizeInfo;
 use crate::container::placement_info::PlacementInfo;
 use crate::container::rectangle::{Border, Rectangle};
 use crate::container_objects::lines::*;
 use crate::container_objects::text_box::*;
-use crate::container_objects::PdfDrawInfo;
 use crate::font::font_info::FontInfo;
 use crate::font::font_sizes::Font;
 use std::cell::RefCell;
@@ -57,11 +56,11 @@ pub struct ListBox<'a> {
     list_data: ListData<'a>,
     manager: &'a mut Manager,
 }
-impl<'a> ContainerTrait<PdfDrawInfo> for ListBox<'a> {
-    fn on_draw(
+impl<'a> ContainerTrait for ListBox<'a> {
+    fn on_draw<T: DrawInfoReq>(
         &mut self,
         placement_info: PlacementInfo,
-        pdf_draw: &mut PdfDrawInfo,
+        pdf_draw: &mut T,
         borders: &Option<RefCell<Vec<Border>>>,
     ) -> Option<PlacementInfo> {
         if self.list_data.data.len() == 0 {
@@ -393,7 +392,7 @@ impl<'a> ContainerTrait<PdfDrawInfo> for ListBox<'a> {
                     (text_color.clone(),text_alignment.clone())
                 };
                 font_i.font_color = color.to_owned();
-                //font_i.size = 6.0;
+                //font_i.size = 2.0;
                 let mut text_box = if this_row_is_header && self.list_data.exclude_border_on_header
                 {
                     TextBox::new(
@@ -873,7 +872,7 @@ impl<'a> ListBox<'a> {
                     }
                 }
                 //is_on_last_row, is_new_page, is_room_for_header_row, is_room_for_normal_row, is_room_for_bottom_row, is_start_row
-                (false, false, false, false, true, false) => {
+                (false, false, false, false, true, false) => { // current problem Bottom,1,false,false,false,false,true,false
                     //class 3
                     next = false;
                     border_position_data.is_bottom_border = true;
@@ -939,12 +938,13 @@ impl<'a> ListBox<'a> {
                         RowPositionType::Item
                     }
                 }
-                (false, false, false, true, true, true) => {
+                (false, false, false, true, true, true) => {/////////last change 7-14-2020
                     next = false;
                     if *page_index == 1 && has_header && self.list_data.exclude_border_on_header {
                         border_position_data.is_top_border = true;
                         RowPositionType::ItemWithTopBorder
                     } else {
+                        border_position_data.is_top_border = true;
                         RowPositionType::Item
                     }
                 }
@@ -1001,7 +1001,7 @@ impl<'a> ListBox<'a> {
                 }
             };
 
-            /*if border_position_data.row_type_and_size != RowPositionType::Searching {
+         /*   if border_position_data.row_type_and_size != RowPositionType::Searching {
                 println!("Row:{}, is_on_last_row({}), is_new_page({}), is_room_for_header_row({}), is_room_for_normal_row({}), is_room_for_bottom_row({})", row_index, is_on_last_row, is_new_page, is_room_for_header_row, is_room_for_normal_row, is_room_for_bottom_row);
                 border_position_data.str_test = format!("{},{},{},{},{},{},{},{}", border_position_data.row_type_and_size, row_index, is_on_last_row, is_new_page, is_room_for_header_row, is_room_for_normal_row, is_room_for_bottom_row,is_start_row);
             }*/
@@ -1022,12 +1022,12 @@ impl<'a> ListBox<'a> {
     pub fn set_row_types(&mut self, types: Vec<TypeOfItem>) {
         self.list_data.types_of_items = types;
     }
-    fn place_level_line(
+    fn place_level_line<T: DrawInfoReq>(
         &mut self,
         top_y_current_page: &mut f64,
         percentage_start_x: usize,
         percentage_width_x: usize,
-        pdf_draw: &mut PdfDrawInfo,
+        pdf_draw: &mut T,
         borders: &Option<RefCell<Vec<Border>>>,
     ) -> PlacementInfo {
         let mut placement_handle = self.manager.get_placement_handle(

@@ -1,20 +1,18 @@
 use backfat::container::manager::Manager;
-
 use lopdf::{Object, Stream};
-use lopdf::content::{Content};
+use lopdf::content::{Content, Operation};
 use lopdf::dictionary;
-
 use backfat::container_objects::text_box::{TextBox, TextAlignment, BorderStyle};
-use backfat::container_objects::PdfDrawInfo;
 use backfat::font::font_sizes::{Font, create_font_recource_id};
 use backfat::font::font_info::{FontInfo};
 use backfat::container::rectangle::Border;
 use std::cell::RefCell;
 use backfat::container_objects::list_box::{ListBoxBorder, TypeOfItem, ListBox, RowData, RowDataTypes};
-use backfat::container_objects::lines::draw_rectangle;
+use backfat::container_objects::lines::{draw_rectangle, draw_vertical_line};
 use backfat::container::placement_info::PlacementInfo;
 
 use rand::Rng;
+use backfat::container::container_trait::DrawInfoReq;
 
 struct PdfDox {
     manager: Manager,
@@ -24,6 +22,25 @@ impl PdfDox {
         Self {
             manager: Manager::new(width_inch, height_inch, dpi, margin_top, margin_bot),
         }
+    }
+}
+
+pub struct PdfDrawInfo {
+    pub pdf: Vec<Vec<Operation>>,
+}
+impl DrawInfoReq for PdfDrawInfo {
+    fn increment_page_buffer(&mut self, page_number: usize) {
+        if page_number >= self.page_array_size() {
+            self.pdf.resize(page_number + 1, Vec::new());
+        }
+    }
+
+    fn page_array_size(&self) -> usize {
+        self.pdf.len()
+    }
+
+    fn insert_into_page(&mut self, page_num: usize, operation: Operation) {
+        self.pdf[page_num].push(operation);
     }
 }
 fn mimic_report() {
@@ -76,9 +93,10 @@ fn mimic_report() {
     }
     {
         let mut txt = TextBox::new("2020",FontInfo::new(14.0, Font::Helvetica), Some(TextAlignment::CenterBottom), Some(BorderStyle::Single(2.0)), Some((0.5, 0.7, 0.9)) , None);
-        let mut placement_handle = dox.manager.get_placement_handle(28..44, false);
-        placement_handle.set_pixel_height(0.25 * 72.0);
-        placement_handle.draw(&mut txt, &mut pdf_draw, &borders);
+        dox.manager.place_now( 0.25 * 72.0,28..44, &mut pdf_draw, &mut txt, &borders)
+        //let mut placement_handle = dox.manager.get_placement_handle(28..44, false);
+        //placement_handle.set_pixel_height(0.25 * 72.0);
+        //placement_handle.draw(&mut txt, &mut pdf_draw, &borders);
     }
     let mut test_data = Vec::new();
     for i in 0..177 {
@@ -151,7 +169,7 @@ fn mimic_report() {
             //println!("Border {}, {}", &border.rec.page_size_info);
                 draw_rectangle(&mut pdf_draw,
                                &border.rec,
-                               border.pixel_size,
+                border.pixel_size,
                                border.color);
             };
         },
@@ -182,7 +200,7 @@ fn mimic_report() {
 	});
     let mut v:Vec<lopdf::Object> = Vec::new();
 
-    for page in 0..dox.manager.get_page_cnt() + 1 {
+    for page in 0..pdf_draw.pdf.len() {
         let content = Content {
             operations: pdf_draw.pdf[page].clone()//draw_data_pdf(0.2, 1.0, &mut columns)
         };
@@ -211,7 +229,6 @@ fn mimic_report() {
     doc.trailer.set("Root", catalog_id);
     doc.compress();
     doc.save("report.pdf").unwrap();
-
 
 }
 

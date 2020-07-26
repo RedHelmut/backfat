@@ -1,5 +1,4 @@
-use crate::container::container_trait::ContainerTrait;
-use crate::container_objects::PdfDrawInfo;
+use crate::container::container_trait::{ContainerTrait, DrawInfoReq};
 use lopdf::content::Operation;
 use lopdf::Object;
 //use crate::container_objects::lines::*;
@@ -178,11 +177,11 @@ impl Default for TextBox {
     }
 }
 
-impl ContainerTrait<PdfDrawInfo> for TextBox {
-    fn on_draw(
+impl ContainerTrait for TextBox {
+    fn on_draw<T: DrawInfoReq>(
         &mut self,
         placement_info: PlacementInfo,
-        draw_to: &mut PdfDrawInfo,
+        draw_to: &mut T,
         borders: &Option<RefCell<Vec<Border>>>,
     ) -> Option<PlacementInfo> {
         let text_color = self.font.font_color;
@@ -203,15 +202,13 @@ impl ContainerTrait<PdfDrawInfo> for TextBox {
             false,
         );
 
-        draw_to.pdf[placement_info.page_number].push(Operation::new("q", vec![]));
-        draw_to.pdf[placement_info.page_number]
-            .push(Operation::new("re", text_draw_info.clone().into()));
-        draw_to.pdf[placement_info.page_number].push(Operation::new("W", vec![]));
-        draw_to.pdf[placement_info.page_number].push(Operation::new("n", vec![]));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("q", vec![]));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("re", text_draw_info.clone().into()));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("W", vec![]));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("n", vec![]));
 
-        draw_to.pdf[placement_info.page_number]
-            .push(Operation::new("CS", vec!["DeviceRGB".into()]));
-        draw_to.pdf[placement_info.page_number].push(Operation::new(
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("CS", vec!["DeviceRGB".into()]));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new(
             "rg",
             vec![
                 self.background.0.into(),
@@ -219,9 +216,8 @@ impl ContainerTrait<PdfDrawInfo> for TextBox {
                 self.background.2.into(),
             ],
         )); //stroke color
-        draw_to.pdf[placement_info.page_number]
-            .push(Operation::new("CS", vec!["DeviceRGB".into()]));
-        draw_to.pdf[placement_info.page_number].push(Operation::new(
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("CS", vec!["DeviceRGB".into()]));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new(
             "SC",
             vec![
                 self.background.0.into(),
@@ -230,21 +226,18 @@ impl ContainerTrait<PdfDrawInfo> for TextBox {
             ],
         ));
         //draw rectangle color for column
-        draw_to.pdf[placement_info.page_number]
-            .push(Operation::new("re", text_draw_info.clone().into()));
-        draw_to.pdf[placement_info.page_number].push(Operation::new("f", vec![]));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("re", text_draw_info.clone().into()));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("f", vec![]));
 
         //border here
         // let rec_text = vec![(text_draw_info.left_pixel_x).into(),text_draw_height.into(), (text_draw_info.pixels_x_width ).into(), (text_draw_info.object_pixel_height).into()];
 
-        draw_to.pdf[placement_info.page_number]
-            .push(Operation::new("re", text_draw_info.clone().into()));
-        draw_to.pdf[placement_info.page_number].push(Operation::new("W", vec![]));
-        draw_to.pdf[placement_info.page_number].push(Operation::new("n", vec![]));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("re", text_draw_info.clone().into()));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("W", vec![]));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("n", vec![]));
 
-        draw_to.pdf[placement_info.page_number]
-            .push(Operation::new("CS", vec!["DeviceRGB".into()]));
-        draw_to.pdf[placement_info.page_number].push(Operation::new(
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("CS", vec!["DeviceRGB".into()]));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new(
             "rg",
             vec![
                 text_color.0.into(),
@@ -252,9 +245,8 @@ impl ContainerTrait<PdfDrawInfo> for TextBox {
                 text_color.2.into(),
             ],
         )); //stroke color
-        draw_to.pdf[placement_info.page_number]
-            .push(Operation::new("CS", vec!["DeviceRGB".into()]));
-        draw_to.pdf[placement_info.page_number].push(Operation::new(
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("CS", vec!["DeviceRGB".into()]));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new(
             "SC",
             vec![
                 text_color.0.into(),
@@ -263,27 +255,27 @@ impl ContainerTrait<PdfDrawInfo> for TextBox {
             ],
         ));
 
-        draw_to.pdf[placement_info.page_number].push(Operation::new("BT", vec![]));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("BT", vec![]));
 
         //get F1 or whatever for font
         let fnt = font_sizes::CROSS_FONT_PDF[&self.font.font].clone();
 
-        draw_to.pdf[placement_info.page_number].push(Operation::new(
+        draw_to.insert_into_page(placement_info.page_number, Operation::new(
             "Tf",
             vec![fnt.into(), self.font.size.into()],
         ));
-        draw_to.pdf[placement_info.page_number].push(Operation::new(
+        draw_to.insert_into_page(placement_info.page_number, Operation::new(
             "Td",
             vec![
                 start_x.into(),                      //placement_info.left_pixel_x.into(),
                 (start_y + text_draw_info.y).into(), //(real_height + font_break.1 * placement_info.dpi).into(),
             ],
         ));
-        draw_to.pdf[placement_info.page_number].push(Operation::new(
+        draw_to.insert_into_page(placement_info.page_number, Operation::new(
             "Tj",
             vec![Object::string_literal(self.text.clone())],
         ));
-        draw_to.pdf[placement_info.page_number].push(Operation::new("ET", vec![]));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("ET", vec![]));
         /*
         {
             if let Some(ref restr) = placement_info.restricted_area_option {
@@ -291,32 +283,32 @@ impl ContainerTrait<PdfDrawInfo> for TextBox {
                 let inner_rec = vec![(restr.left + by_amt).into(), (text_draw_height + by_amt).into(), (restr.width - by_amt * 2.0).into(), (restr.height - by_amt * 2.0).into()];
                 {
                     let border_color = (1.0,0.0,0.0);
-                    draw_to.pdf[placement_info.page_number].push(Operation::new("CS", vec!["DeviceRGB".into()]));
-                    draw_to.pdf[placement_info.page_number].push(Operation::new(
+                    draw_to.insert_into_page(placement_info.page_number, Operation::new("CS", vec!["DeviceRGB".into()]));
+                    draw_to.insert_into_page(placement_info.page_number, Operation::new(
                         "rg",
                         vec![border_color.0.into(), border_color.1.into(), border_color.2.into()],
                     )); //stroke color
-                    draw_to.pdf[placement_info.page_number].push(Operation::new("CS", vec!["DeviceRGB".into()]));
-                    draw_to.pdf[placement_info.page_number].push(Operation::new(
+                    draw_to.insert_into_page(placement_info.page_number, Operation::new("CS", vec!["DeviceRGB".into()]));
+                    draw_to.insert_into_page(placement_info.page_number, Operation::new(
                         "SC",
                         vec![border_color.0.into(), border_color.1.into(), border_color.2.into()],
                     ));
 
                    // rec = vec![(placement_info.left_pixel_x + size / 2.0).into(),(real_height + size / 2.0).into(), (placement_info.pixels_x_width - size).into(), (placement_info.object_pixel_height - size).into()];
 
-                    draw_to.pdf[placement_info.page_number].push(Operation::new("w", vec![1.0.into()]));
-                    draw_to.pdf[placement_info.page_number].push(Operation::new(
+                    draw_to.insert_into_page(placement_info.page_number, Operation::new("w", vec![1.0.into()]));
+                    draw_to.insert_into_page(placement_info.page_number, Operation::new(
                         "re",
                         inner_rec,
                     ));
-                    draw_to.pdf[placement_info.page_number].push(Operation::new("s", vec![]));
+                    draw_to.insert_into_page(placement_info.page_number, Operation::new("s", vec![]));
 
                 }
             }
 
 
         }*/
-        draw_to.pdf[placement_info.page_number].push(Operation::new("Q", vec![]));
+        draw_to.insert_into_page(placement_info.page_number, Operation::new("Q", vec![]));
 
         match self.border_style {
             BorderStyle::Single(size) => match borders {
