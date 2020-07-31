@@ -4173,6 +4173,7 @@ pub fn create_font_recource_id(doc: &mut Document) -> (u32, u16) {
             "BaseFont" => obj,
         });
         let f_name:String = i.0.into();
+        println!("{} => {}, {}", f_name, font_id.0, font_id.1);
         font_id_list.set(f_name, font_id);
     }
     let resources_id = doc.add_object(dictionary! {
