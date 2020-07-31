@@ -4165,7 +4165,9 @@ lazy_static! {
 pub fn create_font_recource_id(doc: &mut Document) -> (u32, u16) {
 
     let mut font_id_list: Dictionary = Dictionary::new();
-    for i in CROSS_PDF_NAME_FONT_TO_STRING_NAME.iter() {
+    let mut v:Vec<_> = CROSS_PDF_NAME_FONT_TO_STRING_NAME.iter().collect();
+    v.sort_by(|x,y| x.0.cmp(&y.0));
+    for i in v {
         let obj:String = i.1.into();
         let font_id = doc.add_object(dictionary! {
             "Type" => "Font",
