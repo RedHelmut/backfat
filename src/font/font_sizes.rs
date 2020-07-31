@@ -4007,7 +4007,7 @@ lazy_static!{
         TimesBold_widths.insert('0', 0.50);
 
         let mut map = HashMap::new();
-      /*  map.insert(Font::TimesRoman, TimesRoman_widths);
+        map.insert(Font::TimesRoman, TimesRoman_widths);
         map.insert(Font::HelveticaOblique, HelveticaOblique_widths);
         map.insert(Font::HelveticaBold, HelveticaBold_widths);
         map.insert(Font::HelveticaBoldOblique, HelveticaBoldOblique_widths);
@@ -4016,11 +4016,11 @@ lazy_static!{
         map.insert(Font::CourierOblique, CourierOblique_widths);
         map.insert(Font::CourierBold, CourierBold_widths);
         map.insert(Font::CourierBoldOblique, CourierBoldOblique_widths);
-        map.insert(Font::TimesBoldItalic, TimesBoldItalic_widths);*/
+        map.insert(Font::TimesBoldItalic, TimesBoldItalic_widths);
         map.insert(Font::Helvetica, Helvetica_widths);
-        /*map.insert(Font::Symbol, Symbol_widths);
+        map.insert(Font::Symbol, Symbol_widths);
         map.insert(Font::TimesItalic, TimesItalic_widths);
-        map.insert(Font::TimesBold, TimesBold_widths);*/
+        map.insert(Font::TimesBold, TimesBold_widths);
         map
     };
 }
@@ -4044,7 +4044,7 @@ lazy_static! {
     pub static ref FONT_DESCENT: HashMap<Font, f64> = {
         let mut FontDecent: HashMap<Font, f64> = HashMap::new();
         FontDecent.insert(Font::Helvetica, 434.0);
-       /* FontDecent.insert(Font::HelveticaOblique, 434.0);
+        FontDecent.insert(Font::HelveticaOblique, 434.0);
         FontDecent.insert(Font::HelveticaBold, 434.0);
         FontDecent.insert(Font::HelveticaBoldOblique, 434.0);
         FontDecent.insert(Font::Courier, 615.0);
@@ -4057,7 +4057,7 @@ lazy_static! {
         FontDecent.insert(Font::TimesBold, 443.0);
         FontDecent.insert(Font::ZapfDingbats, 432.0);
         FontDecent.insert(Font::Symbol, 450.0);
-*/
+
         FontDecent
     };
 }
@@ -4065,7 +4065,7 @@ lazy_static! {
 /// Supported fonts
 #[derive(Hash, PartialEq, Eq, Debug, Clone)]
 pub enum Font {
-   /* TimesRoman,
+    TimesRoman,
     HelveticaOblique,
     HelveticaBold,
     HelveticaBoldOblique,
@@ -4074,11 +4074,11 @@ pub enum Font {
     CourierOblique,
     CourierBold,
     CourierBoldOblique,
-    TimesBoldItalic,*/
+    TimesBoldItalic,
     Helvetica,
-    /*Symbol,
+    Symbol,
     TimesItalic,
-    TimesBold,*/
+    TimesBold,
 }
 
 
@@ -4087,7 +4087,7 @@ lazy_static! {
         let mut hsp = HashMap::new();
 
         let add = vec![
-           /* (Font::TimesRoman, "F1"),
+            (Font::TimesRoman, "F1"),
             (Font::HelveticaOblique, "F2"),
             (Font::HelveticaBold, "F3"),
             (Font::HelveticaBoldOblique, "F4"),
@@ -4096,13 +4096,11 @@ lazy_static! {
             (Font::CourierOblique, "F7"),
             (Font::CourierBold, "F8"),
             (Font::CourierBoldOblique, "F9"),
-            (Font::TimesBoldItalic, "F10"),*/
+            (Font::TimesBoldItalic, "F10"),
             (Font::Helvetica, "F11"),
-            /*(Font::Symbol, "F12"),
+            (Font::Symbol, "F12"),
             (Font::TimesItalic, "F13"),
-            (Font::TimesBold, "F14")*/
-            ];
-
+            (Font::TimesBold, "F14")];
 
         for i in add {
             hsp.insert( i.0, i.1.to_owned() );
@@ -4116,7 +4114,7 @@ lazy_static! {
         let mut hsp = HashMap::new();
 
         let add = vec![
-           /* ("TimesRoman", "F1"),
+            ("TimesRoman", "F1"),
             ("HelveticaOblique", "F2"),
             ("HelveticaBold", "F3"),
             ("HelveticaBoldOblique", "F4"),
@@ -4125,13 +4123,11 @@ lazy_static! {
             ("CourierOblique", "F7"),
             ("CourierBold", "F8"),
             ("CourierBoldOblique", "F9"),
-            ("TimesBoldItalic", "F10"),*/
+            ("TimesBoldItalic", "F10"),
             ("Helvetica", "F11"),
-            /*("Symbol", "F12"),
+            ("Symbol", "F12"),
             ("TimesItalic", "F13"),
-            ("TimesBold", "F14")*/
-            ];
-
+            ("TimesBold", "F14")];
 
         for i in add {
             hsp.insert( i.0.to_owned(), i.1.to_owned() );
@@ -4144,7 +4140,7 @@ lazy_static! {
         let mut hsp = HashMap::new();
 
         let add = vec![
-       /*     ("F1","TimesRoman",),
+            ("F1","TimesRoman",),
             ("F2","HelveticaOblique",),
             ("F3","HelveticaBold",),
             ("F4","HelveticaBoldOblique",),
@@ -4153,13 +4149,11 @@ lazy_static! {
             ("F7","CourierOblique",),
             ("F8","CourierBold",),
             ("F9","CourierBoldOblique",),
-            ("F10","TimesBoldItalic" ,),*/
+            ("F10","TimesBoldItalic" ,),
             ("F11","Helvetica", ),
-            /*("F12","Symbol", ),
+            ("F12","Symbol", ),
             ("F13","TimesItalic" ,),
-            ("F14","TimesBold",)*/
-            ];
-
+            ("F14","TimesBold",) ];
 
         for i in add {
             hsp.insert( i.0.to_owned(), i.1.to_owned() );
