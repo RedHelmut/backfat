@@ -4165,22 +4165,7 @@ lazy_static! {
 pub fn create_font_recource_id(doc: &mut Document) -> (u32, u16) {
 
     let mut font_id_list: Dictionary = Dictionary::new();
-    let add = vec![
-        ("F1","TimesRoman",),
-        ("F2","HelveticaOblique",),
-        ("F3","HelveticaBold",),
-        ("F4","HelveticaBoldOblique",),
-        ("F5","ZapfDingbats",),
-        ("F6","Courier",),
-        ("F7","CourierOblique",),
-        ("F8","CourierBold",),
-        ("F9","CourierBoldOblique",),
-        ("F10","TimesBoldItalic" ,),
-        ("F11","Helvetica", ),
-        ("F12","Symbol", ),
-        ("F13","TimesItalic" ,),
-        ("F14","TimesBold",) ];
-    for i in add.iter() {
+    for i in CROSS_PDF_NAME_FONT_TO_STRING_NAME.iter() {
         let obj:String = i.1.into();
         let font_id = doc.add_object(dictionary! {
             "Type" => "Font",
