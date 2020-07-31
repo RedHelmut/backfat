@@ -164,7 +164,7 @@ impl Default for TextBox {
         Self {
             text: "".to_string(),
             font: FontInfo {
-                font: Font::TimesRoman,
+                font: Font::Helvetica,
                 size: 12.0,
                 font_color: (0.0, 0.0, 0.0),
             },

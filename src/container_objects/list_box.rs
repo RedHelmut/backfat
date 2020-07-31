@@ -1038,7 +1038,7 @@ impl<'a> ListBox<'a> {
 
         let mut blank = TextBox::new(
             "",
-            FontInfo::new(0.0, Font::Courier),
+            FontInfo::new(0.0, Font::Helvetica),
             None,
             None,
             None,
